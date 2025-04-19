@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <meta
+      http-equiv="X-UA-Compatible"
+      content="IE=edge"
+    />
+    <title>Arkanoid Mickel Arroz</title>
+    <meta
+      name="description"
+      content="Versión personalizada de Arkanoid hecha por Mickel Arroz. ¡Rompe todos los ladrillos y diviértete!"
+    />
+    <meta
+      name="keywords"
+      content="Arkanoid, juego retro, Mickel Arroz, JavaScript, canvas, videojuego"
+    />
+    <meta
+      name="author"
+      content="Mickel Arroz"
+    />
+
+    <!-- Open Graph -->
+    <meta
+      property="og:title"
+      content="Arkanoid Mickel Arroz"
+    />
+    <meta
+      property="og:description"
+      content="Versión personalizada de Arkanoid hecha en JavaScript. ¡Juega ahora!"
+    />
+    <meta
+      property="og:image"
+      content="https://tusitio.com/assets/preview.png"
+    />
+    <meta
+      property="og:url"
+      content="https://tusitio.com"
+    />
+    <meta
+      property="og:type"
+      content="website"
+    />
+
+    <!-- Twitter Card -->
+    <meta
+      name="twitter:card"
+      content="summary_large_image"
+    />
+    <meta
+      name="twitter:title"
+      content="Arkanoid Mickel Arroz"
+    />
+    <meta
+      name="twitter:description"
+      content="Versión personalizada de Arkanoid hecha en JavaScript. ¡Juega ya!"
+    />
+    <meta
+      name="twitter:image"
+      content="https://tusitio.com/assets/preview.png"
+    />
+    <meta
+      name="twitter:creator"
+      content="@tucuenta"
+    />
+
+    <!-- Favicon y tema -->
+    <link
+      rel="icon"
+      href="/public/arcade-favicon.svg"
+    />
+
+    <!-- Enlace al archivo CSS -->
+    <link
+      rel="stylesheet"
+      href="./styles.css"
+    />
+  </head>
+
+  <body>
+    <div class="grid">
+      <!-- Fila 1 -->
+      <div class="cell"></div>
+      <div class="cell logo">
+        <img
+          src="./public/sprite-title.png"
+          alt="Arkanoid Logo"
+        />
+      </div>
+      <div class="cell"></div>
+
+      <!-- Fila 2 -->
+      <div class="cell"></div>
+
+      <div class="cell center">
+        <canvas></canvas>
+      </div>
+
+      <div class="cell score">
+        <div class="score-box">
+          <span>Puntuación:</span>
+          <strong id="puntuacion">0000</strong>
+        </div>
+      </div>
+
+      <!-- Fila 3 (footer ancho completo) -->
+      <div class="footer">Agradecimientos a <a href="/">MiduDev💜</a></div>
+    </div>
+
+    <img
+      id="sprite"
+      src="./public/sprite.png"
+      alt="Arkanoid Sprites"
+      hidden
+    />
+    <img
+      id="bricks"
+      src="./public/bricks.png"
+      alt="Arkanoid Bricks"
+      hidden
+    />
+
+    <script src="./script.js"></script>
+  </body>
+</html>
