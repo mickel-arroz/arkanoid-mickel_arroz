@@ -26,11 +26,10 @@ let paddleY = canvas.height - paddleHeight - 10;
 let leftPressed = false;
 let rightPressed = false;
 
-// Puntuacion
+// Puntuación
 let score = 0;
 
-// ======== NIVELES Y LADRILLOS ========
-
+// Ladrillos
 const brickWidth = 32;
 const brickHeight = 16;
 const brickPadding = 1;
@@ -235,36 +234,9 @@ const levels = [
 let bricks = [];
 let currentLevel = levels[1];
 
-// Generador de nivel a partir de array de colores
-const initLevel = (levelData) => {
-  const rows = levelData.length;
-  const cols = levelData[0].length;
-
-  const totalBricksWidth = cols * brickWidth + (cols - 1) * brickPadding;
-  const brickOffsetLeft = (canvas.width - totalBricksWidth) / 2;
-
-  bricks = [];
-
-  for (let r = 0; r < rows; r++) {
-    bricks[r] = [];
-    for (let c = 0; c < cols; c++) {
-      const color = levelData[r][c];
-      if (color === 0) {
-        bricks[r][c] = null;
-        continue;
-      }
-
-      const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-      const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
-
-      bricks[r][c] = {
-        x: brickX,
-        y: brickY,
-        status: BRICK_STATUS.ACTIVE,
-        color: color,
-      };
-    }
-  }
+// ======== FUNCIONES AUXILIARES ========
+const cleanCanvas = () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
 
 // ======== FUNCIONES DE DIBUJADO ========
@@ -319,10 +291,6 @@ const drawScore = () => {
   // Placeholder
 };
 
-const cleanCanvas = () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-};
-
 // ======== FUNCIONES DE LÓGICA ========
 const ballMovement = () => {
   if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
@@ -348,7 +316,7 @@ const ballMovement = () => {
   }
 
   if (y + ballRadius + dy > canvas.height) {
-    document.location.reload();
+    mostrarModalGameOver();
   }
 
   x += dx;
@@ -407,6 +375,37 @@ const collisionDetection = () => {
   }
 };
 
+const initLevel = (levelData) => {
+  const rows = levelData.length;
+  const cols = levelData[0].length;
+
+  const totalBricksWidth = cols * brickWidth + (cols - 1) * brickPadding;
+  const brickOffsetLeft = (canvas.width - totalBricksWidth) / 2;
+
+  bricks = [];
+
+  for (let r = 0; r < rows; r++) {
+    bricks[r] = [];
+    for (let c = 0; c < cols; c++) {
+      const color = levelData[r][c];
+      if (color === 0) {
+        bricks[r][c] = null;
+        continue;
+      }
+
+      const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+      const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+
+      bricks[r][c] = {
+        x: brickX,
+        y: brickY,
+        status: BRICK_STATUS.ACTIVE,
+        color: color,
+      };
+    }
+  }
+};
+
 // ======== EVENTOS DE TECLADO ========
 const initEvent = () => {
   document.addEventListener("keydown", (event) => {
@@ -426,15 +425,46 @@ const initEvent = () => {
   });
 };
 
-// ======== FUNCIÓN PRINCIPAL ========
-const draw = () => {
-  cleanCanvas();
+// ======== FUNCIONES DEL MODAL GAME OVER ========
+function mostrarModalGameOver() {
+  document.getElementById("modalGameOver").style.display = "flex";
+  dx = 0;
+  dy = 0;
+}
 
+function ocultarModalGameOver() {
+  document.getElementById("modalGameOver").style.display = "none";
+}
+
+document.getElementById("btnContinuar").addEventListener("click", () => {
+  ocultarModalGameOver();
+  reiniciarJuego();
+});
+
+function reiniciarJuego() {
+  window.location.reload();
+}
+
+let isGameStarted = false;
+
+document.getElementById("btnStart").addEventListener("click", () => {
+  document.getElementById("modalInicio").style.display = "none";
+  isGameStarted = true;
+});
+
+// ======== FUNCIÓN PRINCIPAL ========
+
+const draw = () => {
+  if (!isGameStarted) {
+    window.requestAnimationFrame(draw);
+    return;
+  }
+
+  cleanCanvas();
   drawBall();
   drawPaddle();
   drawBricks();
   drawScore();
-
   collisionDetection();
   ballMovement();
   paddleMovement();

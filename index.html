@@ -79,6 +79,11 @@
       rel="stylesheet"
       href="./styles.css"
     />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
@@ -97,7 +102,21 @@
       <div class="cell"></div>
 
       <div class="cell center">
+        <div id="modalInicio">
+          <p>PLAY GAME</p>
+          <button id="btnStart">START</button>
+        </div>
         <canvas></canvas>
+      </div>
+
+      <div
+        id="modalGameOver"
+        class="modal"
+      >
+        <div class="modal-contenido">
+          <h2>GAME OVER</h2>
+          <button id="btnContinuar">¿Continuar?</button>
+        </div>
       </div>
 
       <div class="cell score">

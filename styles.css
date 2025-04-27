@@ -1,5 +1,29 @@
+/* ======== VARIABLES ======== */
+:root {
+  /* Colores */
+  --color-fondo: #111;
+  --color-texto: rgba(255, 255, 255, 0.8);
+  --color-rojo-sangre: #851931;  /* Rojo oscuro */
+  --color-rojo-hover: #9a2d44;  /* Rojo oscuro en hover */
+  --color-fondo-modal: rgba(0, 0, 0, 0.9);
+  --color-borde: #444;
+  --color-fondo-footer: #222;
+  --color-acento: #0f0; /* Verde acento (puedes ajustar si prefieres otro) */
+
+  /* Tamaños de fuentes */
+  --fuente-principal: 'Press Start 2P', monospace, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --fuente-titulo: 1.5rem;
+  --fuente-texto: 1.1rem;
+  --fuente-modal: 24px;
+  --fuente-pequena: 0.7rem;
+
+  /* Espaciados y márgenes */
+  --espaciado-general: 20px;
+  --espaciado-pequeno: 10px;
+  --espaciado-footer: 4px;
+}
+
 /* ======== RESET DE ESTILOS GENERALES ======== */
-/* Reset para normalizar los estilos en diferentes navegadores */
 *,
 *::before,
 *::after {
@@ -10,7 +34,7 @@
 
 body, html {
   height: 100%;
-  font-family: sans-serif;
+  font-family: var(--fuente-principal);
 }
 
 ol, ul {
@@ -29,85 +53,163 @@ table {
 
 /* ======== Estilos Generales ======== */
 body {
-  background-color: red;
+  background-color: var(--color-fondo);
   margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   width: 100dvw;
-  font-family: sans-serif;
+  color: var(--color-texto);
 }
 
 /* ======== Grid 3x3 ======== */
 .grid {
   display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 3fr)
-    minmax(0, 1fr);
-  grid-template-rows:
-    minmax(0, 0.5fr)
-    minmax(0, 2fr)
-    minmax(0, 0.1fr); /* Footer más pequeño */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 3fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 0.5fr) minmax(0, 2fr) minmax(0, 0.1fr);
   width: 100%;
-  /* max-width: 1000px; */
   height: 100%;
   box-sizing: border-box;
 }
 
 /* ======== Celdas generales ======== */
 .cell {
-  border: 1px solid #444;
+  border: 1px solid var(--color-borde);
   background-color: #1a1a1a;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #ccc;
+  color: var(--color-texto);
   text-align: center;
 }
-
 
 /* ======== Canvas en el centro ======== */
 .center {
   grid-column: 2 / 3;
   grid-row: 2 / 3;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .center canvas {
   border: 4px solid #fff;
   background: url(./public/bkg.png) repeat;
-
 }
 
 /* ======== Contador de puntuación (visual) ======== */
 .score-box {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--espaciado-pequeno);
   text-align: center;
-  font-size: 1.1rem;
-  color: #fff;
+  font-size: var(--fuente-texto);
+  color: var(--color-texto);
 }
 
 .score-box strong {
-  font-size: 1.5rem;
-  color: #0f0;
+  font-size: var(--fuente-titulo);
+  color: var(--color-rojo-sangre);  /* Rojo oscuro */
 }
 
 /* ======== Imagen (titulo) ======== */
-
-.logo{
+.logo {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.logo img{
+.logo img {
   width: 90%;
   max-width: 500px;
 }
 
+/* MODAL GAME OVER */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-fondo-modal);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-contenido {
+  background-color: var(--color-fondo);
+  padding: var(--espaciado-general);
+  border: 4px solid var(--color-rojo-sangre);  /* Rojo oscuro */
+  text-align: center;
+  box-shadow: 0 0 20px var(--color-rojo-sangre);  /* Rojo oscuro */
+}
+
+.modal-contenido h2 {
+  font-size: var(--fuente-modal);
+  margin-bottom: var(--espaciado-general);
+  animation: parpadeo 1s infinite;
+}
+
+.modal-contenido button {
+  background-color: var(--color-rojo-sangre);  /* Rojo oscuro */
+  color: #fff;
+  border: 2px solid var(--color-rojo-sangre);  /* Rojo oscuro */
+  padding: var(--espaciado-pequeno) var(--espaciado-general);
+  font-family: var(--fuente-principal);
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.modal-contenido button:hover {
+  background-color: var(--color-rojo-hover);  /* Rojo más claro */
+  border-color: var(--color-rojo-hover);
+}
+
+@keyframes parpadeo {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* MODAL INICIO */
+#modalInicio {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#modalInicio p {
+  font-size: var(--fuente-modal);
+  margin-bottom: var(--espaciado-general);
+  color: var(--color-texto);
+  animation: parpadeo 1s infinite;
+}
+
+#modalInicio button {
+  background-color: var(--color-rojo-sangre);  /* Rojo oscuro */
+  color: #fff;
+  border: 2px solid var(--color-rojo-sangre);  /* Rojo oscuro */
+  padding: var(--espaciado-pequeno) var(--espaciado-general);
+  font-family: var(--fuente-principal);
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#modalInicio button:hover {
+  background-color: var(--color-rojo-hover);  /* Rojo más claro */
+  border-color: var(--color-rojo-hover);
+}
 
 /* ======== Contador de puntuación (numérico) ======== */
 
@@ -115,10 +217,10 @@ body {
 .footer {
   grid-column: 1 / 4;
   grid-row: 3 / 4;
-  background-color: #222;
-  color: #aaa;
-  font-size: 0.7rem;
-  padding: 4px;
+  background-color: var(--color-fondo-footer);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: var(--fuente-pequena);
+  padding: var(--espaciado-footer);
   text-align: center;
-  border: 1px solid #444;
+  border: 1px solid var(--color-borde);
 }
