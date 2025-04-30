@@ -99,24 +99,35 @@
       <div class="cell"></div>
 
       <!-- Fila 2 -->
-      <div class="cell"></div>
-
-      <div class="cell center">
-        <div id="modalInicio">
-          <p>PLAY GAME</p>
-          <button id="btnStart">START</button>
-        </div>
-        <canvas></canvas>
+      <div class="cell">
+        <!-- Y un botón de pausa en pantalla -->
+        <button
+          id="btnPause"
+          class="btn"
+        >
+          PAUSA
+        </button>
       </div>
 
-      <div
-        id="modalGameOver"
-        class="modal"
-      >
-        <div class="modal-contenido">
-          <h2>GAME OVER</h2>
-          <button id="btnContinuar">¿Continuar?</button>
+      <div class="cell center">
+        <div
+          id="modal"
+          class="modal"
+        >
+          <p
+            id="modalMessage"
+            class="modalMessage"
+          >
+            START GAME
+          </p>
+          <button
+            id="modalButton"
+            class="btn"
+          >
+            START
+          </button>
         </div>
+        <canvas></canvas>
       </div>
 
       <div class="cell score">
@@ -127,7 +138,9 @@
       </div>
 
       <!-- Fila 3 (footer ancho completo) -->
-      <div class="footer">Agradecimientos a <a href="/">MiduDev💜</a></div>
+      <div class="footer">
+        Agradecimientos a <a href="https://midu.dev">MiduDev</a>
+      </div>
     </div>
 
     <img

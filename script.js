@@ -21,7 +21,7 @@ const BALL_SPEED = Math.sqrt(dx * dx + dy * dy);
 const paddleHeight = 10;
 const paddleWidth = 50;
 let paddleX = (canvas.width - paddleWidth) / 2;
-let paddleY = canvas.height - paddleHeight - 10;
+let paddleY = canvas.height - paddleHeight - 2;
 
 let leftPressed = false;
 let rightPressed = false;
@@ -316,7 +316,7 @@ const ballMovement = () => {
   }
 
   if (y + ballRadius + dy > canvas.height) {
-    mostrarModalGameOver();
+    showModal("gameover");
   }
 
   x += dx;
@@ -425,32 +425,96 @@ const initEvent = () => {
   });
 };
 
-// ======== FUNCIONES DEL MODAL GAME OVER ========
-function mostrarModalGameOver() {
-  document.getElementById("modalGameOver").style.display = "flex";
-  dx = 0;
-  dy = 0;
+// ======== FUNCIONES DE MODALES ========
+
+let isGameStarted = false;
+let juegoPausado = false;
+let isGameOver = false;
+
+const modal = document.getElementById("modal");
+const modalMessage = document.getElementById("modalMessage");
+const modalButton = document.getElementById("modalButton");
+
+// Función unificada que muestra la modal según el tipo
+function showModal(modalType) {
+  if (modalType !== "gameover") isGameOver = false;
+  switch (modalType) {
+    case "inicio":
+      modalMessage.textContent = "PLAY GAME";
+      modalButton.textContent = "START";
+      modalButton.onclick = () => {
+        modal.style.display = "none";
+        isGameStarted = true;
+        juegoPausado = false;
+      };
+      break;
+
+    case "gameover":
+      modalMessage.textContent = "GAME OVER";
+      modalButton.textContent = "CONTINUAR";
+      modalButton.onclick = () => {
+        modal.style.display = "none";
+        reiniciarJuego();
+      };
+      dx = 0;
+      dy = 0;
+      isGameOver = true;
+      break;
+
+    case "pausa":
+      if (isGameOver) return;
+      modalMessage.textContent = "PAUSA";
+      modalButton.textContent = "REANUDAR";
+      modalButton.onclick = () => {
+        modal.style.display = "none";
+        juegoPausado = false;
+        // Aquí reanudas la animación o el bucle del juego exactamente donde quedó
+      };
+      break;
+    default:
+      console.error("Modal type no reconocido");
+      return;
+  }
+  modal.style.display = "flex";
 }
 
-function ocultarModalGameOver() {
-  document.getElementById("modalGameOver").style.display = "none";
-}
+// Al cargar la página, se muestra la modal de "PLAY GAME"
+showModal("inicio");
 
-document.getElementById("btnContinuar").addEventListener("click", () => {
-  ocultarModalGameOver();
-  reiniciarJuego();
+// Botón de pausa en pantalla
+btnPause.addEventListener("click", () => {
+  if (!isGameStarted || isGameOver) return;
+  if (!juegoPausado) {
+    juegoPausado = true;
+    showModal("pausa");
+    // Aquí detienes el bucle o animación del juego, si es necesario
+  } else {
+    // Si ya está pausado, se comporta como continuar
+    modal.style.display = "none";
+    juegoPausado = false;
+    // Reanudar el juego (aquí podrías llamar a la función de reanudar)
+  }
 });
 
+// Evento para pausar/reanudar con la tecla "P"
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "p" && isGameStarted && !isGameOver) {
+    if (!juegoPausado) {
+      juegoPausado = true;
+      showModal("pausa");
+      // Pausa el juego
+    } else {
+      modal.style.display = "none";
+      juegoPausado = false;
+      // Reanuda el juego
+    }
+  }
+});
+
+// Función de reinicio (puedes mantener la tuya o adaptarla)
 function reiniciarJuego() {
   window.location.reload();
 }
-
-let isGameStarted = false;
-
-document.getElementById("btnStart").addEventListener("click", () => {
-  document.getElementById("modalInicio").style.display = "none";
-  isGameStarted = true;
-});
 
 // ======== FUNCIÓN PRINCIPAL ========
 
@@ -465,9 +529,12 @@ const draw = () => {
   drawPaddle();
   drawBricks();
   drawScore();
-  collisionDetection();
-  ballMovement();
-  paddleMovement();
+
+  if (!juegoPausado) {
+    collisionDetection();
+    ballMovement();
+    paddleMovement();
+  }
 
   window.requestAnimationFrame(draw);
 };

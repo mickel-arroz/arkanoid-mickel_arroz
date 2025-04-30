@@ -16,6 +16,7 @@
   --fuente-texto: 1.1rem;
   --fuente-modal: 24px;
   --fuente-pequena: 0.7rem;
+  --fuente-micro: 0.5rem;
 
   /* Espaciados y márgenes */
   --espaciado-general: 20px;
@@ -67,7 +68,7 @@ body {
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 3fr) minmax(0, 1fr);
-  grid-template-rows: minmax(0, 0.5fr) minmax(0, 2fr) minmax(0, 0.1fr);
+  grid-template-rows: minmax(0, 0.5fr) minmax(0, 2fr) minmax(0, 0.07fr); 
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -95,7 +96,12 @@ body {
 }
 
 .center canvas {
-  border: 4px solid #fff;
+  border-width: 15px;    
+  border-style: solid;
+  border-image-source: url('./public/marco-sprite.png');
+  border-image-slice: 10;     
+  border-image-repeat: stretch;
+  
   background: url(./public/bkg.png) repeat;
 }
 
@@ -126,89 +132,53 @@ body {
   max-width: 500px;
 }
 
-/* MODAL GAME OVER */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--color-fondo-modal);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-contenido {
-  background-color: var(--color-fondo);
-  padding: var(--espaciado-general);
-  border: 4px solid var(--color-rojo-sangre);  /* Rojo oscuro */
-  text-align: center;
-  box-shadow: 0 0 20px var(--color-rojo-sangre);  /* Rojo oscuro */
-}
-
-.modal-contenido h2 {
-  font-size: var(--fuente-modal);
-  margin-bottom: var(--espaciado-general);
-  animation: parpadeo 1s infinite;
-}
-
-.modal-contenido button {
+/* ======== Botón general ======== */
+.btn {
   background-color: var(--color-rojo-sangre);  /* Rojo oscuro */
   color: #fff;
   border: 2px solid var(--color-rojo-sangre);  /* Rojo oscuro */
   padding: var(--espaciado-pequeno) var(--espaciado-general);
   font-family: var(--fuente-principal);
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 
-.modal-contenido button:hover {
+.btn:hover {
   background-color: var(--color-rojo-hover);  /* Rojo más claro */
   border-color: var(--color-rojo-hover);
 }
 
-@keyframes parpadeo {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
 
-/* MODAL INICIO */
-#modalInicio {
+/* ----------------- MODALES -----------------*/
+
+/* ======== MODALES UNIFICADAS ======== */
+.modal {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 2;
+  background: var(--color-fondo-modal);
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-#modalInicio p {
+.modal p,
+.modal h2 {
   font-size: var(--fuente-modal);
   margin-bottom: var(--espaciado-general);
   color: var(--color-texto);
   animation: parpadeo 1s infinite;
+  text-align: center;
 }
 
-#modalInicio button {
-  background-color: var(--color-rojo-sangre);  /* Rojo oscuro */
-  color: #fff;
-  border: 2px solid var(--color-rojo-sangre);  /* Rojo oscuro */
-  padding: var(--espaciado-pequeno) var(--espaciado-general);
-  font-family: var(--fuente-principal);
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
 
-#modalInicio button:hover {
-  background-color: var(--color-rojo-hover);  /* Rojo más claro */
-  border-color: var(--color-rojo-hover);
+@keyframes parpadeo {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* ======== Contador de puntuación (numérico) ======== */
@@ -219,8 +189,16 @@ body {
   grid-row: 3 / 4;
   background-color: var(--color-fondo-footer);
   color: rgba(255, 255, 255, 0.6);
-  font-size: var(--fuente-pequena);
+  font-size: var(--fuente-micro);
   padding: var(--espaciado-footer);
   text-align: center;
   border: 1px solid var(--color-borde);
+}
+
+.footer a {
+  color: var(--color-rojo-sangre);
+}
+
+.footer a:hover {
+  color: var(--color-rojo-hover);
 }
