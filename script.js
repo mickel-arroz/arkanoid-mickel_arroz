@@ -1,21 +1,32 @@
 // ======== VARIABLES GLOBALES ========
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
+let animationFrameId = null;
 
 const $sprite = document.getElementById("sprite");
 const $bricks = document.getElementById("bricks");
 const $score = document.getElementById("puntuacion");
+const levelSelector = document.getElementById("levelSelector");
+const difficultySelector = document.getElementById("difficultySelector");
 
-canvas.width = 500;
-canvas.height = 450;
+canvas.width = 700;
+canvas.height = 475;
+
+const FPS = 60;
+let lastRender = 0;
+let deltaTime = 0;
+
+const baseDx = 3;
+const baseDy = -1;
 
 // Pelota
 const ballRadius = 3;
 let x = canvas.width / 2;
 let y = canvas.height - 40;
-let dx = 3;
-let dy = -1;
-const BALL_SPEED = Math.sqrt(dx * dx + dy * dy);
+
+let BALL_SPEED;
+let dx = baseDx;
+let dy = baseDy;
 
 // Paleta
 const paddleHeight = 10;
@@ -40,7 +51,7 @@ const BRICK_STATUS = {
   ACTIVE: 1,
 };
 
-// Niveles creativos (12x16) con colores (1 a 7)
+// Niveles creativos (14x20) con colores (1 a 7)
 const levels = [
   // Nivel 1: Alien Retro
   [
@@ -54,7 +65,6 @@ const levels = [
     [0, 0, 7, 7, 0, 0, 0, 0, 7, 7, 0, 0],
     [0, 0, 7, 7, 0, 0, 0, 0, 7, 7, 0, 0],
     [0, 7, 7, 0, 0, 0, 0, 0, 0, 7, 7, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -78,7 +88,6 @@ const levels = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ],
   // Nivel 3: Nave espacial
   [
@@ -97,26 +106,6 @@ const levels = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  ],
-  // Nivel 4: Flecha
-  [
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0],
-    [0, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0],
-    [0, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0],
-    [0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0],
-    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0],
   ],
   // Nivel 5: Fantasma
   [
@@ -135,104 +124,57 @@ const levels = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ],
-  // Nivel 6: Lava
   [
-    [0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0],
-    [0, 1, 2, 3, 3, 3, 3, 3, 3, 2, 1, 0],
-    [0, 1, 2, 3, 4, 4, 4, 3, 3, 2, 1, 0],
-    [1, 1, 2, 3, 4, 5, 4, 3, 2, 2, 1, 1],
-    [1, 1, 2, 3, 4, 5, 4, 3, 2, 2, 1, 1],
-    [0, 1, 2, 3, 4, 5, 4, 3, 2, 2, 1, 0],
-    [0, 1, 2, 3, 3, 3, 3, 3, 2, 2, 1, 0],
-    [0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-    [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-  ],
-
-  // Nivel 7: Árbol
-  [
-    [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1],
-    [1, 2, 2, 3, 3, 3, 3, 3, 3, 2, 2, 1],
-    [1, 2, 3, 3, 4, 4, 4, 4, 3, 3, 2, 1],
-    [1, 2, 3, 4, 4, 4, 4, 4, 4, 3, 2, 1],
-    [1, 2, 3, 4, 5, 5, 5, 5, 4, 3, 2, 1],
-    [1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1],
-    [0, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 0],
-    [0, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 0],
-    [0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0],
-    [0, 0, 1, 2, 3, 4, 4, 3, 2, 1, 0, 0],
-    [0, 0, 1, 2, 3, 4, 4, 3, 2, 1, 0, 0],
-    [0, 0, 0, 1, 2, 3, 3, 2, 1, 0, 0, 0],
-    [0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0],
-  ],
-  // Nivel 8: Escudo
-  [
-    [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0],
     [0, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 0],
-    [1, 1, 2, 3, 3, 3, 3, 3, 3, 2, 1, 1],
+    [1, 2, 2, 3, 3, 3, 3, 3, 3, 2, 2, 1],
     [1, 2, 3, 4, 4, 4, 4, 4, 4, 3, 2, 1],
-    [1, 2, 3, 4, 5, 5, 5, 5, 4, 3, 2, 1],
-    [1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1],
-    [0, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 0],
-    [0, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 0],
-    [0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0],
-    [0, 0, 1, 2, 3, 4, 4, 3, 2, 1, 0, 0],
-    [0, 0, 1, 2, 3, 4, 4, 3, 2, 1, 0, 0],
-    [0, 0, 0, 1, 2, 3, 3, 2, 1, 0, 0, 0],
-    [0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-  ],
-  // Nivel 9: Ojo
-  [
-    [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 0],
-    [0, 1, 2, 3, 3, 3, 3, 3, 3, 2, 1, 0],
-    [0, 1, 2, 3, 4, 4, 4, 4, 3, 2, 1, 0],
-    [0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0],
-    [1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1],
-    [1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1],
-    [1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1],
-    [0, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 0],
-    [0, 0, 3, 4, 5, 6, 6, 5, 4, 3, 0, 0],
-    [0, 0, 0, 3, 4, 5, 5, 4, 3, 0, 0, 0],
-    [0, 0, 0, 0, 3, 4, 4, 3, 0, 0, 0, 0],
+    [1, 3, 4, 4, 5, 5, 5, 5, 4, 4, 3, 1],
+    [1, 3, 4, 5, 5, 5, 5, 5, 4, 4, 3, 1],
+    [0, 3, 4, 5, 6, 6, 5, 5, 4, 4, 3, 0],
+    [0, 3, 4, 5, 6, 6, 5, 5, 4, 4, 3, 0],
+    [0, 0, 3, 4, 5, 5, 4, 4, 3, 3, 0, 0],
+    [0, 0, 3, 4, 4, 4, 4, 4, 3, 3, 0, 0],
+    [0, 0, 0, 3, 3, 3, 3, 3, 3, 0, 0, 0],
+    [0, 0, 0, 0, 3, 3, 3, 3, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ],
-  // Nivel 10: Espiral
   [
-    [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-    [0, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 0],
-    [1, 1, 2, 3, 3, 3, 3, 3, 3, 2, 1, 1],
-    [1, 2, 3, 4, 4, 4, 4, 4, 4, 3, 2, 1],
-    [1, 2, 3, 4, 5, 5, 5, 5, 4, 3, 2, 1],
-    [1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1],
-    [0, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 0],
-    [0, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 0],
-    [0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0],
-    [0, 0, 1, 2, 3, 4, 4, 3, 2, 1, 0, 0],
-    [0, 0, 1, 2, 3, 4, 4, 3, 2, 1, 0, 0],
-    [0, 0, 0, 1, 2, 3, 3, 2, 1, 0, 0, 0],
-    [0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0],
+    [0, 0, 1, 1, 2, 2, 2, 2, 1, 1, 0, 0],
+    [0, 1, 1, 2, 2, 3, 3, 2, 2, 1, 1, 0],
+    [1, 1, 2, 2, 3, 3, 3, 3, 2, 2, 1, 1],
+    [1, 2, 2, 3, 3, 4, 4, 3, 3, 2, 2, 1],
+    [2, 2, 3, 3, 4, 4, 4, 4, 3, 3, 2, 2],
+    [2, 3, 3, 4, 4, 5, 5, 4, 4, 3, 3, 2],
+    [3, 3, 4, 4, 5, 5, 5, 5, 4, 4, 3, 3],
+    [3, 4, 4, 5, 5, 6, 6, 5, 5, 4, 4, 3],
+    [3, 5, 5, 6, 6, 7, 7, 6, 6, 5, 5, 3],
+    [3, 4, 4, 5, 5, 6, 6, 5, 5, 4, 4, 3],
+    [3, 3, 4, 4, 5, 5, 5, 5, 4, 4, 3, 3],
+    [2, 3, 3, 4, 4, 5, 5, 4, 4, 3, 3, 2],
+    [2, 2, 3, 3, 4, 4, 4, 4, 3, 3, 2, 2],
   ],
 ];
 
 let bricks = [];
-let currentLevel = levels[1];
+
+let currentLevelIndex = 0;
+
+let currentModal = null;
+
+// ======== FUNCIONES AUXILIARES ========
+const difficultySettings = {
+  facil: { ballMultiplier: 1, paddleSpeed: 6 },
+  normal: { ballMultiplier: 2, paddleSpeed: 8 },
+  dificil: { ballMultiplier: 2.5, paddleSpeed: 11 },
+  extremo: { ballMultiplier: 4, paddleSpeed: 14 },
+};
+let currentDifficulty = "facil";
 
 // ======== FUNCIONES AUXILIARES ========
 const cleanCanvas = () => {
@@ -324,18 +266,22 @@ const ballMovement = () => {
 };
 
 const paddleMovement = () => {
+  let paddleSpeed = difficultySettings[currentDifficulty].paddleSpeed;
   if (leftPressed && paddleX > 3) {
-    paddleX -= 6;
+    paddleX -= paddleSpeed;
   } else if (rightPressed && paddleX < canvas.width - paddleWidth - 3) {
-    paddleX += 6;
+    paddleX += paddleSpeed;
   }
 };
 
 const collisionDetection = () => {
+  let remainingBricks = 0;
   for (let r = 0; r < bricks.length; r++) {
     for (let c = 0; c < bricks[r].length; c++) {
       const brick = bricks[r][c];
       if (!brick || brick.status === BRICK_STATUS.DESTROYED) continue;
+
+      remainingBricks++;
 
       const brickLeft = brick.x;
       const brickRight = brick.x + brickWidth;
@@ -373,7 +319,44 @@ const collisionDetection = () => {
       }
     }
   }
+
+  if (remainingBricks === 0 && isGameStarted) {
+    showModal("level-complete");
+  }
 };
+
+// ======== INICIALIZACIÓN DEL SELECTOR DE NIVELES ========
+function initLevelSelector() {
+  levels.forEach((_, index) => {
+    const option = document.createElement("option");
+    option.value = index;
+    option.textContent = `Nivel ${index + 1}`;
+    levelSelector.appendChild(option);
+  });
+
+  levelSelector.value = 0;
+  updateSelectorState();
+}
+
+// ======== EVENTO DE CAMBIO DE NIVEL ========
+
+levelSelector.addEventListener("change", () => {
+  currentLevelIndex = parseInt(levelSelector.value);
+  reiniciarJuego();
+  showModal("inicio");
+  isGameStarted = false;
+  updateSelectorState();
+});
+
+function updateSelectorState() {
+  if (currentModal) {
+    levelSelector.disabled = false;
+    difficultySelector.disabled = false;
+  } else {
+    levelSelector.disabled = true;
+    difficultySelector.disabled = true;
+  }
+}
 
 const initLevel = (levelData) => {
   const rows = levelData.length;
@@ -406,6 +389,37 @@ const initLevel = (levelData) => {
   }
 };
 
+// ======== INICIALIZACIÓN DEL SELECTOR DE DIFICULTAD ========
+function initDifficultySelector() {
+  Object.keys(difficultySettings).forEach((key) => {
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = `${key.charAt(0).toUpperCase() + key.slice(1)}`;
+    difficultySelector.appendChild(option);
+  });
+
+  difficultySelector.value = currentDifficulty;
+  updateDifficultySelectorState();
+}
+
+// ======== EVENTOS DE CAMBIO DE DIFICULTAD ========
+difficultySelector.addEventListener("change", () => {
+  currentDifficulty = difficultySelector.value;
+  // Reiniciamos el juego para aplicar la nueva velocidad de pelota y paleta.
+  reiniciarJuego();
+  showModal("inicio");
+  isGameStarted = false;
+  updateDifficultySelectorState();
+});
+
+function updateDifficultySelectorState() {
+  if (currentModal) {
+    difficultySelector.disabled = false;
+  } else {
+    difficultySelector.disabled = true;
+  }
+}
+
 // ======== EVENTOS DE TECLADO ========
 const initEvent = () => {
   document.addEventListener("keydown", (event) => {
@@ -435,42 +449,82 @@ const modal = document.getElementById("modal");
 const modalMessage = document.getElementById("modalMessage");
 const modalButton = document.getElementById("modalButton");
 
-// Función unificada que muestra la modal según el tipo
 function showModal(modalType) {
-  if (modalType !== "gameover") isGameOver = false;
+  if (currentModal && currentModal !== modalType) return;
+
+  currentModal = modalType;
+
   switch (modalType) {
     case "inicio":
+      currentModal = "inicio";
       modalMessage.textContent = "PLAY GAME";
       modalButton.textContent = "START";
+      updateSelectorState(); // Habilita el select
       modalButton.onclick = () => {
         modal.style.display = "none";
+        currentModal = null;
         isGameStarted = true;
         juegoPausado = false;
+        isGameOver = false;
+        updateSelectorState();
       };
       break;
 
     case "gameover":
+      currentModal = "gameover";
       modalMessage.textContent = "GAME OVER";
       modalButton.textContent = "CONTINUAR";
+      isGameStarted = false;
+      isGameOver = true;
+      updateSelectorState();
+
       modalButton.onclick = () => {
         modal.style.display = "none";
+        currentModal = null;
         reiniciarJuego();
+        isGameStarted = true;
+        updateSelectorState();
       };
-      dx = 0;
-      dy = 0;
-      isGameOver = true;
       break;
 
     case "pausa":
-      if (isGameOver) return;
+      if (isGameOver || !isGameStarted) return;
+      currentModal = "pausa";
       modalMessage.textContent = "PAUSA";
       modalButton.textContent = "REANUDAR";
+      isGameStarted = false; // Mantener este estado
+      updateSelectorState(); // Habilitar select al estar pausa
       modalButton.onclick = () => {
         modal.style.display = "none";
         juegoPausado = false;
-        // Aquí reanudas la animación o el bucle del juego exactamente donde quedó
+        currentModal = null;
+        isGameStarted = true;
+        updateSelectorState();
       };
       break;
+
+    case "level-complete":
+      currentModal = "level-complete";
+      const isLastLevel = currentLevelIndex === levels.length - 1;
+      modalMessage.textContent = isLastLevel
+        ? "¡FELICIDADES! JUEGO COMPLETADO"
+        : "¡NIVEL COMPLETADO!";
+      modalButton.textContent = isLastLevel ? "REINICIAR" : "SIGUIENTE NIVEL";
+      updateSelectorState();
+      modalButton.onclick = () => {
+        if (isLastLevel) {
+          currentLevelIndex = 0;
+          reiniciarJuego(true);
+        } else {
+          currentLevelIndex++;
+          reiniciarJuego(false);
+        }
+        levelSelector.value = currentLevelIndex;
+        modal.style.display = "none";
+        currentModal = null;
+      };
+      break;
+
     default:
       console.error("Modal type no reconocido");
       return;
@@ -478,51 +532,99 @@ function showModal(modalType) {
   modal.style.display = "flex";
 }
 
-// Al cargar la página, se muestra la modal de "PLAY GAME"
 showModal("inicio");
 
 // Botón de pausa en pantalla
 btnPause.addEventListener("click", () => {
-  if (!isGameStarted || isGameOver) return;
-  if (!juegoPausado) {
-    juegoPausado = true;
-    showModal("pausa");
-    // Aquí detienes el bucle o animación del juego, si es necesario
-  } else {
-    // Si ya está pausado, se comporta como continuar
+  if (currentModal && currentModal !== "pausa") return;
+
+  if (currentModal === "pausa") {
+    // Cerrar
     modal.style.display = "none";
     juegoPausado = false;
-    // Reanudar el juego (aquí podrías llamar a la función de reanudar)
+    currentModal = null;
+    isGameStarted = true;
+  } else if (isGameStarted) {
+    // Abrir
+    juegoPausado = true;
+    showModal("pausa");
   }
+  updateSelectorState();
 });
 
 // Evento para pausar/reanudar con la tecla "P"
 document.addEventListener("keydown", (e) => {
-  if (e.key.toLowerCase() === "p" && isGameStarted && !isGameOver) {
-    if (!juegoPausado) {
-      juegoPausado = true;
-      showModal("pausa");
-      // Pausa el juego
-    } else {
+  if (e.key.toLowerCase() === "p" && !isGameOver) {
+    // Solo actuar si no hay game over
+    if (currentModal === "pausa") {
+      // Cerrar modal de pausa
       modal.style.display = "none";
       juegoPausado = false;
-      // Reanuda el juego
+      currentModal = null;
+      isGameStarted = true;
+    } else if (!currentModal && isGameStarted) {
+      juegoPausado = true;
+      showModal("pausa");
     }
+    updateSelectorState();
   }
 });
 
-// Función de reinicio (puedes mantener la tuya o adaptarla)
-function reiniciarJuego() {
-  window.location.reload();
+// ======== FUNCIÓN DE REINICIO ========
+function reiniciarJuego(resetScore = true) {
+  x = canvas.width / 2;
+  y = canvas.height - 40;
+  dx = baseDx * difficultySettings[currentDifficulty].ballMultiplier;
+  dy = baseDy * difficultySettings[currentDifficulty].ballMultiplier;
+  BALL_SPEED = Math.sqrt(dx * dx + dy * dy);
+  paddleX = (canvas.width - paddleWidth) / 2;
+
+  if (resetScore) {
+    score = 0;
+    $score.innerText = "0000";
+  }
+
+  isGameOver = false;
+  juegoPausado = false;
+  leftPressed = false;
+  rightPressed = false;
+
+  currentModal = null;
+
+  updateSelectorState();
+
+  currentLevel = levels[currentLevelIndex];
+  initLevel(currentLevel);
+
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+  }
+
+  modal.style.display = "none";
+  cleanCanvas();
+  drawBall();
+  drawPaddle();
+  drawBricks();
+
+  animationFrameId = window.requestAnimationFrame(draw);
 }
 
 // ======== FUNCIÓN PRINCIPAL ========
 
-const draw = () => {
+const draw = (timestamp) => {
   if (!isGameStarted) {
-    window.requestAnimationFrame(draw);
+    animationFrameId = window.requestAnimationFrame(draw);
     return;
   }
+
+  deltaTime = timestamp - lastRender;
+
+  if (deltaTime < 1000 / FPS) {
+    animationFrameId = window.requestAnimationFrame(draw);
+    return;
+  }
+
+  lastRender = timestamp;
 
   cleanCanvas();
   drawBall();
@@ -536,11 +638,14 @@ const draw = () => {
     paddleMovement();
   }
 
-  window.requestAnimationFrame(draw);
+  animationFrameId = window.requestAnimationFrame(draw);
 };
 
 // ======== INICIO ========
 ctx.closePath();
 initEvent();
-initLevel(currentLevel); // Primer nivel por defecto
+initLevelSelector();
+initDifficultySelector();
+initLevel(levels[currentLevelIndex]);
+
 draw();

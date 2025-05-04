@@ -100,13 +100,39 @@
 
       <!-- Fila 2 -->
       <div class="cell">
-        <!-- Y un botón de pausa en pantalla -->
         <button
           id="btnPause"
           class="btn"
+          title="Pausar Juego"
         >
           PAUSA
         </button>
+        <div class="select-container">
+          <label
+            id="levelLabel"
+            class="select-label"
+            >Seleccionar Nivel</label
+          >
+          <select
+            id="levelSelector"
+            class="select"
+            aria-labelledby="levelLabel"
+            title="Selector de nivel del juego"
+          ></select>
+        </div>
+        <div class="select-container">
+          <label
+            id="difficultyLabel"
+            class="select-label"
+            >Select Dificultad</label
+          >
+          <select
+            id="difficultySelector"
+            class="select"
+            aria-labelledby="difficultyLabel"
+            title="Selector de dificultad del juego"
+          ></select>
+        </div>
       </div>
 
       <div class="cell center">

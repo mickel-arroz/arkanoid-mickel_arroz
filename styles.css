@@ -22,6 +22,7 @@
   --espaciado-general: 20px;
   --espaciado-pequeno: 10px;
   --espaciado-footer: 4px;
+  --espaciado-elemntos: 4rem;
 }
 
 /* ======== RESET DE ESTILOS GENERALES ======== */
@@ -79,7 +80,9 @@ body {
   border: 1px solid var(--color-borde);
   background-color: #1a1a1a;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  gap: var(--espaciado-elemntos);
   align-items: center;
   color: var(--color-texto);
   text-align: center;
@@ -144,7 +147,12 @@ body {
 }
 
 .btn:hover {
-  background-color: var(--color-rojo-hover);  /* Rojo más claro */
+  background-color: var(--color-rojo-hover);  
+  border-color: var(--color-rojo-hover);
+}
+
+.btn.active {
+  background-color: var(--color-rojo-hover);
   border-color: var(--color-rojo-hover);
 }
 
@@ -201,4 +209,74 @@ body {
 
 .footer a:hover {
   color: var(--color-rojo-hover);
+}
+
+
+/* ======== SELECTOR DE NIVELES ======== */
+.select-container {
+  /* position: absolute; */
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.select-label {
+  font-size: var(--fuente-pequena);
+  color: var(--color-texto);
+  text-shadow: 0 0 2px rgba(255, 0, 0, 0.5);
+}
+
+.select {
+  background-color: var(--color-fondo-footer);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23851831'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 25px;
+  color: var(--color-texto);
+  border: 2px solid var(--color-rojo-sangre);
+  margin-top: 5px;
+  padding: 10px 10px;
+  font-family: var(--fuente-principal);
+  cursor: pointer;
+  transition: all 0.3s;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: auto;
+  white-space: nowrap;
+}
+
+.select:hover {
+  border-color: var(--color-rojo-hover);
+  background-color: rgba(133, 25, 49, 0.1);
+}
+
+.select option {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  padding: 5px;
+}
+
+.select option:hover {
+  background-color: var(--color-rojo-sangre) !important;
+}
+
+.select:focus {
+  outline: none;
+  box-shadow: 0 0 5px var(--color-rojo-sangre);
+}
+
+/* Estado deshabilitado */
+.select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--color-borde);
+}
+
+.select:disabled:hover {
+  background-color: transparent;
+  border-color: var(--color-borde);
 }
