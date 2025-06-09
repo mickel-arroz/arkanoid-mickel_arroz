@@ -107,6 +107,31 @@ body {
   text-align: center;
 }
 
+/* Alien Arcade */
+.pixel-block {
+  position: absolute;
+  width: 10em;
+  height: 7em;
+  padding-top: 1rem;
+}
+.pixelized--invaders {
+  display: block;
+  width: 1em;
+  height: 1em;
+  box-shadow: 2em 0em #7f2828, 8em 0em #7f2828, 3em 1em #7f2828, 7em 1em #7f2828,
+    2em 2em #7f2828, 3em 2em #7f2828, 4em 2em #7f2828, 5em 2em #7f2828,
+    6em 2em #7f2828, 7em 2em #7f2828, 8em 2em #7f2828, 1em 3em #7f2828,
+    2em 3em #7f2828, 4em 3em #7f2828, 5em 3em #7f2828, 6em 3em #7f2828,
+    8em 3em #7f2828, 9em 3em #7f2828, 0em 4em #7f2828, 1em 4em #7f2828,
+    2em 4em #7f2828, 3em 4em #7f2828, 4em 4em #7f2828, 5em 4em #7f2828,
+    6em 4em #7f2828, 7em 4em #7f2828, 8em 4em #7f2828, 9em 4em #7f2828,
+    10em 4em #7f2828, 0em 5em #7f2828, 2em 5em #7f2828, 3em 5em #7f2828,
+    4em 5em #7f2828, 5em 5em #7f2828, 6em 5em #7f2828, 7em 5em #7f2828,
+    8em 5em #7f2828, 10em 5em #7f2828, 0em 6em #7f2828, 2em 6em #7f2828,
+    8em 6em #7f2828, 10em 6em #7f2828, 3em 7em #7f2828, 4em 7em #7f2828,
+    6em 7em #7f2828, 7em 7em #7f2828;
+}
+
 /* ======== Canvas en el centro ======== */
 .center {
   grid-column: 2 / 3;
